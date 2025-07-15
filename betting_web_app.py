@@ -5,6 +5,9 @@ import os
 import joblib
 from sklearn.preprocessing import LabelEncoder
 
+#python -m streamlit run betting_web_app.py
+
+
 # Streamlit config
 st.set_page_config(page_title="Horse Racing Bets", layout="wide")
 st.title("🏇 Horse Racing Prediction and Bet Selector")
@@ -68,7 +71,7 @@ if uploaded_file:
     # === PREDICTIONS ===
     info_columns = ['Date of Race', 'Time', 'Track', 'Horse', 'Distance', 'Place', 'Industry SP', 'Betfair SP']
     pre_race_features = [
-        'Going', 'Distance', 'Class', 'Stall', 'Official Rating', 'Age', 'Weight',
+        'Going', 'Distance', 'Class', 'Stall', 'Official Rating', 'Age',
         'SP Fav', 'Industry SP', 'Forecasted Odds',
         'Runs last 18 months', 'Wins Last 5 races',
         'Avg % SP Drop Last 5 races', 'Avg % SP Drop last 18 mths',
@@ -111,8 +114,8 @@ if uploaded_file:
     max_odds_threshold = 100.0
     winrate_filter_type = 'none'
     fixed_winrate_threshold = 0.03
-    min_runners = 1
-    max_runners = 40
+    min_runners = 5
+    max_runners = 5
 
     predictions['Reject_Reason'] = ''
     if rank_filter_enabled:

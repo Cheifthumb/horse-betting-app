@@ -6,6 +6,12 @@ data['Place'] = pd.to_numeric(data['Place'], errors='coerce')
 data = data.sort_values(by=['Date of Race', 'Time']).reset_index(drop=True)
 data['Race_ID'] = data['Date of Race'].astype(str) + "_" + data['Time'].astype(str)
 
+# ✅ Track filter
+track_filter = ['CATTERICK']  # Change or add other tracks if needed
+if track_filter is not None:
+    data = data[data['Track'].isin(track_filter)]
+print(f"🏇 Track Filter: {track_filter if track_filter else 'All tracks'}")
+
 # ✅ Normalize predictions
 data['Predicted_Rank'] = data.groupby('Race_ID')['Predicted_Win_Probability'].rank(method='first', ascending=False)
 data['Odds_To_Use'] = data['Industry SP']
@@ -16,18 +22,18 @@ data['Expected_Value'] = (data['Predicted_Win_Probability'] * (data['Odds_To_Use
 bankroll = 10000
 bankroll_perc = 0.1
 min_ev = -5
-min_kelly = -1
+min_kelly = -0.5
 max_odds = 100.0
 winrate_filter_type = 'none'  # or 'fixed', 'dynamic'
 fixed_winrate_threshold = 0.03
-reverse_forecast_total_stake = 20
+reverse_forecast_total_stake = 50
 
 reverse_results = []
 
 # ✅ Loop over races
 for race_id, race_df in data.groupby('Race_ID', sort=False):
     full_field_size = len(race_df)
-    if not ((4 <= full_field_size <= 5) or (full_field_size >= 41)):
+    if not ((4 <= full_field_size <= 13) or (full_field_size >= 41)):
         continue
 
     full_race = race_df.copy()
@@ -113,7 +119,9 @@ for race_id, race_df in data.groupby('Race_ID', sort=False):
 
 # ✅ Save results
 reverse_df = pd.DataFrame(reverse_results)
-reverse_df.to_excel('betting_simulation/reverse_forecast_results.xlsx', index=False)
+field_sizes = data.groupby('Race_ID')['Horse'].count()
+reverse_df['Field_Size'] = reverse_df['Race_ID'].map(field_sizes)
+reverse_df.to_excel('betting_simulation/reverse_forecast_results_23-25.xlsx', index=False)
 
 # ✅ Summary
 if not reverse_df.empty:
@@ -130,3 +138,23 @@ if not reverse_df.empty:
     ))
 else:
     print("\n📭 No reverse forecast bets placed.")
+
+# ✅ Optional: Breakdown by field size bin
+if not reverse_df.empty:
+    print("\n📦 Reverse Forecast Return by Field Size Bin:")
+
+    field_bins = [0, 5,6,7, 8, 9, 10, 11, 12, 20, 100]
+    bin_labels = ['≤5', '6','7','8', '9', '10', '11', '12', '13-20', '21+']
+    reverse_df['Field_Bin'] = pd.cut(reverse_df['Field_Size'], bins=field_bins, labels=bin_labels, right=True)
+
+    reverse_df['Either_Win'] = (reverse_df['Result_AB'] == 'Win') | (reverse_df['Result_BA'] == 'Win')
+
+    bin_summary = reverse_df.groupby('Field_Bin').agg(
+        Num_Bets=('R_Multiple', 'count'),
+        Total_Return=('Total_Return', 'sum'),
+        Avg_R_Multiple=('R_Multiple', 'mean'),
+        Win_Rate=('Either_Win', 'mean')
+    ).reset_index()
+
+    bin_summary['Win_Rate'] = (bin_summary['Win_Rate'] * 100).round(1).astype(str) + '%'
+    print(bin_summary.to_string(index=False))

@@ -111,6 +111,6 @@ def clean_and_engineer(file_path, output_name="model_data"):
 
 if __name__ == "__main__":
     # 👇 Update with your file and desired name
-    file_path = "Daily_Bets/12.07.2025 Copy.xlsx"
-    output_name = "12.07.2025 Copy"
+    file_path = "Merged/M_10-25.xlsx"
+    output_name = "10-25"
     clean_and_engineer(file_path, output_name=output_name)

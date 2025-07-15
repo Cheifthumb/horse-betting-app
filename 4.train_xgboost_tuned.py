@@ -8,11 +8,11 @@ from sklearn.metrics import accuracy_score, roc_auc_score, classification_report
 from sklearn.preprocessing import LabelEncoder
 
 # Load data
-data = pd.read_excel('featured_data/02-25_FEATURED.xlsx')
+data = pd.read_excel('featured_data/10-25_FEATURED.xlsx')
 
 # Pre-race features
 pre_race_features = [
-    'Going', 'Distance', 'Class', 'Stall', 'Official Rating', 'Age', 'Weight',
+    'Going', 'Distance', 'Class', 'Stall', 'Official Rating', 'Age',
     'SP Fav', 'Industry SP', 'Forecasted Odds',
     'Runs last 18 months', 'Wins Last 5 races',
     'Avg % SP Drop Last 5 races', 'Avg % SP Drop last 18 mths',
@@ -66,6 +66,6 @@ print("✅ AUC Score:", roc_auc_score(y_test, y_prob))
 print("\n✅ Classification Report:\n", classification_report(y_test, y_pred))
 
 # Save the trained model
-joblib.dump(model, 'models/xgboost_tuned_model_02-25.pkl')
+joblib.dump(model, 'models/xgboost_tuned_model_10-25.pkl')
 print("\n✅ Model saved to 'models/xgboost_tuned_model.pkl'")
 
